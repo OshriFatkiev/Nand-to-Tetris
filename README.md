@@ -1,1 +1,3 @@
 # nand-to-tetris
+this project based on the course '##### from nand to tetris' given in The Hebrew University of Jerusalem. In order to learn more, visit the course official website at
+...
