@@ -1,0 +1,54 @@
+CHIP Mul{
+    IN a[16], b[16];
+    OUT out[16];
+
+    PARTS:
+    Mux16(a=false, b=a, sel=b[0], out=outzero);
+    ShiftLeft(in=a, out=oneshift);
+    Mux16(a=false, b=oneshift, sel=b[1], out=outone);
+    ShiftLeft(in=oneshift, out=twoshift);
+    Mux16(a=false, b=twoshift, sel=b[2], out=outtwo);
+    ShiftLeft(in=twoshift, out=threeshift);
+    Mux16(a=false, b=threeshift, sel=b[3], out=outthree);
+    ShiftLeft(in=threeshift, out=fourshift);
+    Mux16(a=false, b=fourshift, sel=b[4], out=outfour);
+    ShiftLeft(in=fourshift, out=fiveshift);
+    Mux16(a=false, b=fiveshift, sel=b[5], out=outfive);
+    ShiftLeft(in=fiveshift, out=sixshift);
+    Mux16(a=false, b=sixshift, sel=b[6], out=outsix);
+    ShiftLeft(in=sixshift, out=svnshift);
+    Mux16(a=false, b=svnshift, sel=b[7], out=outsvn);
+    ShiftLeft(in=svnshift, out=egtshift);
+    Mux16(a=false, b=egtshift, sel=b[8], out=outegt);
+    ShiftLeft(in=egtshift, out=ninshift);
+    Mux16(a=false, b=ninshift, sel=b[9], out=outnin);
+    ShiftLeft(in=ninshift, out=tenshift);
+    Mux16(a=false, b=tenshift, sel=b[10], out=outten);
+    ShiftLeft(in=tenshift, out=elvnshift);
+    Mux16(a=false, b=elvnshift, sel=b[11], out=outelvn);
+    ShiftLeft(in=elvnshift, out=twlvshift);
+    Mux16(a=false, b=twlvshift, sel=b[12], out=outtwlv);
+    ShiftLeft(in=twlvshift, out=trtnshift);
+    Mux16(a=false, b=trtnshift, sel=b[13], out=outtrtn);
+    ShiftLeft(in=trtnshift, out=frtnshift);
+    Mux16(a=false, b=frtnshift, sel=b[14], out=outfrtn);
+    ShiftLeft(in=frtnshift, out=fftnshift);
+    Mux16(a=false, b=fftnshift, sel=b[15], out=outfftn);
+    
+	//Adding the solutions:
+    Add16(a=outzero, b=outone, out=faddzero);
+    Add16(a=outtwo, b=outthree, out=faddone);
+    Add16(a=outfour, b=outfive, out=faddtwo);
+    Add16(a=outsix, b=outsvn, out=faddthree);
+    Add16(a=outegt, b=outnin, out=faddfour);
+    Add16(a=outten, b=outelvn, out=faddfive);
+    Add16(a=outtwlv, b=outtrtn, out=faddsix);
+    Add16(a=outfrtn, b=outfftn, out=faddsvn);
+    Add16(a=faddzero, b=faddone, out=saddzero);
+    Add16(a=faddtwo, b=faddthree, out=saddone);
+    Add16(a=faddfour, b=faddfive, out=saddtwo);
+    Add16(a=faddsix, b=faddsvn, out=saddthree);
+    Add16(a=saddzero, b=saddone, out=taddzero);
+    Add16(a=saddtwo, b=saddthree, out=taddone);
+    Add16(a=taddzero, b=taddone, out=out);
+}
