@@ -1,0 +1,43 @@
+/**
+* The input of the extends ALU is instruction[9] and x[16],y[16].
+* the output is define as follows:
+* If instruction[7..8] equals 1 the the output is exactly as the ALU.
+* Where instruction[5]=zx,instruction[4]=nx,...,instruction[0]=no.
+* If instruction[7] equals 0 the output will be x*y and disregard the rest 
+* of the instruction.
+*
+* If instruction[8] equals 0 the output will be shift.
+* Then, if instruction[4] equals 0 it will return shift of y otherwise shift 
+* of x, moreover if instruction[5] equals 0 it will return shift right 
+* otherwise shift left.
+**/
+
+CHIP ExtendAlu{
+     IN x[16],y[16],instruction[9];
+     OUT out[16],zr,ng;
+     
+     PARTS:
+	 
+	 ALU(x=x,y=y,
+	   zx=instruction[5],
+	   nx=instruction[4],
+	   zy=instruction[3],
+	   ny=instruction[2],
+	    f=instruction[1],
+	   no=instruction[0],
+	  out=alu, zr=zrout, ng=ngout);
+	  
+	 Mul(a=x,b=y,out=mul);
+	 Mux16(a=y, b=x, sel=instruction[4], out=value);
+	 ShiftRight(in=value, out=right);
+	 ShiftLeft(in=value, out=left);
+	 Mux16(a=right, b=left, sel=instruction[5], out=shift);
+	  
+     Mux4Way16(a=shift, b=shift, c=mul, d=alu, sel=instruction[7..8],
+		 out[15]=ng, out[0..7]=righthalf, out[8..15]=lefthalf, out=out);
+		 
+	 Or8Way(in=righthalf, out=zr1);
+	 Or8Way(in=lefthalf, out=zr2);
+	 Or(a=zr1, b=zr2, out=notzr);
+	 Not(in=notzr, out=zr);	 
+}
