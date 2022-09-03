@@ -1,0 +1,151 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Memory.jack
+
+/**
+ * This library provides two services: direct access to the computer's main
+ * memory (RAM), and allocation and recycling of memory blocks. The Hack RAM
+ * consists of 32,768 words, each holding a 16-bit binary number.
+ */ 
+class Memory {
+
+	static Array ram;
+	static Array list, not_found;
+	static int class_size, free_length, free_next;
+	
+    /** Initializes the class. */
+    function void init() {
+		let ram = 0;
+		let list = 2048;
+		let not_found = 16384;
+		let free_length = 0;
+		let free_next = 1;			
+		let class_size = -1;				
+		let list[free_length] = 14336;
+		let list[free_next] = null;
+		return;
+    }
+
+    /** Returns the RAM value at the given address. */
+    function int peek(int address) {
+		return ram[address]; 
+    }
+
+    /** Sets the RAM value at the given address to the given value. */
+    function void poke(int address, int value) {
+		let ram[address] = value;
+		return;
+    }
+
+    /** Finds an available RAM block of the given size and returns
+     *  a reference to its base address. */
+    function int alloc(int size) {
+		var Array temp;
+        var Array arr;
+        
+        let temp = Memory.fit(size);   
+        if(temp = not_found) {
+            let arr = null; 
+        }
+        else {
+            if( temp = null ) {
+                let arr = list;  
+                let list = Memory.alloc_helper(arr, size);
+            }
+            else {
+                let arr = temp[free_next];
+                let temp[free_next] = Memory.alloc_helper(arr, size);
+            }
+        }
+        return arr+1;
+    }
+
+    /** De-allocates the given object (cast as an array) by making
+     *  it available for future allocations. */
+    function void deAlloc(Array o) {
+        var int size;
+        var Array previous, next;
+        let size = o[class_size];
+        let o = o - 1;    
+        let previous = Memory.find_free(o);
+        
+        if(previous = null) {   
+            let o[free_length] = size;
+            let o[free_next] = list;
+            let list = o;
+            let previous = o;
+        }
+        else {
+            if((previous + previous[free_length]) = o) {
+                let previous[free_length] = previous[free_length] + size;
+            }
+            else {
+                let o[free_length] = size;
+                let o[free_next] = previous[free_next];
+                let previous[free_next] = o;
+                let previous = o;
+            }
+        }        
+        if((previous + previous[free_length]) = previous[free_next]) {
+            let next = previous[free_next];
+            let previous[free_length] = previous[free_length] + next[free_length];
+            let previous[free_next] = next[free_next];
+        }
+        return;
+    }    	
+	
+	function Array alloc_helper(Array arr, int size) {
+        var Array next;
+        var int b_size;
+        
+        if(arr[free_length] > (size+3)) { 
+            let next = arr + size+1;
+            let next[free_next] = arr[free_next];
+            let next[free_length] = arr[free_length] - (next-arr);
+            let arr = arr + 1;     
+            let arr[class_size] = size+1; 
+        }
+        else {   
+            let next = arr[free_next];
+            let b_size = arr[free_next];
+            let arr = arr + 1;     
+            let arr[class_size] = b_size;
+        }      
+        return next;
+    }
+	
+	function Array find_free(Array o) {
+        var Array arr;
+        
+        if( list > o ) {
+            return null;
+        }
+        let arr = list;
+        while(~(arr[free_next] = null) & (arr[free_next] < o)) {
+            let arr = arr[free_next];
+        }
+        return arr;
+    }
+	
+	/** implements best-fit alogorithm */ 
+	function Array fit(int size) {
+        var Array best, previous, current;
+        var int b_size, c_size;
+		let previous = null;
+        let best = not_found;
+        let b_size = 16384 - 2048;
+        let current = list;
+        
+        while( ~(current = null) ) {
+            let c_size = current[free_length]-1;
+            if((c_size < b_size) & ~(c_size < size)) {
+                let best = previous; 
+                let b_size = c_size;
+            }
+            let previous = current;
+            let current = current[free_next];
+        }
+        return best;
+    }
+}
