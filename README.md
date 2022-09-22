@@ -7,4 +7,4 @@ this project based on the course '67925 from nand to tetris' given by Noam Nisan
 ## How to run the code
 
 ## License
-nand-to-tetris is [MIT licensed](https://github.com/oshri-fatkiev/nand-to-tetris/blob/main/LICENSE).
+nand-to-tetris is [MIT licensed](https://github.com/oshri-fatkiev/nand-to-tetris/blob/main/LICENSE.md).
